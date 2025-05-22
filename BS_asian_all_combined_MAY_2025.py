@@ -1363,9 +1363,8 @@ if __name__ == "__main__":
 Weights_opt_with_bounds = result_data_with_bounds["Optimal_weights"]
 P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
 if __name__ == "__main__":
-
-
-    plot_one_run( K1,
+    plot_one_run(
+    K1,
     K2,
     truncation_range,
     N,
@@ -1381,13 +1380,10 @@ if __name__ == "__main__":
     save=True,
     folder='BS_Asian_plots_MAY_2025',
     fname='Conditional_plot_with_bounds',
-    show=True,         
+    show=True,
     asian_payoff=Asian_option_payoff,
-    bs_call=BS_call,
-#     lo = 2,
-#     hi = -2         
+    bs_call=BS_call
 )
-    
        
 
 
@@ -1403,7 +1399,7 @@ if __name__ == "__main__":
 
 
 
-regularization = "ridge"
+
     
 
     
@@ -1411,6 +1407,7 @@ lmda_reg = 0.043
 def run_experiment_with_ridge():
     list_of_objectives = []
     list_of_dictionaries = []
+    regularization = "ridge"
     result_data_with_ridge = run_experiment_no_M(solver="gurobi",
         truncation_range=truncation_range,
         N=N,
@@ -1446,7 +1443,7 @@ def run_experiment_with_ridge():
 result_data_with_ridge = run_experiment_with_ridge()
 print(f"========== Experiment Complete ==========")
 if __name__ == "__main__":
-    print("Optimal Weights:", result_data_with_ridge["Optima_weight"])
+    print("Optimal Weights:", result_data_with_ridge["Optimal_weights"])
     print("Final Value from min-max:", result_data_with_ridge["Final_value"])
         
         
