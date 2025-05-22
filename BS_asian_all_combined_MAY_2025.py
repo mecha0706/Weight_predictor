@@ -497,8 +497,8 @@ def min_max_optimization(
             "hedge_value": hedge_value
         }
         log.append(log_entry)
-        print(f"value from gurobi:{call_val}")
-        print(f"val solving max LP:{f_w_pr}\n")
+        # print(f"value from gurobi:{call_val}")
+        # print(f"val solving max LP:{f_w_pr}\n")
        
         return f_w_pr
 
@@ -1186,7 +1186,7 @@ result_data_no_bounds = run_experiment_no_M_without_bounds()
 print(f"========== Experiment Complete ==========")
 
 if __name__ == "__main__":
-    print("Optimal Weights:", result_data_no_bounds["Optimal_weight"])
+    print("Optimal Weights:", result_data_no_bounds["Optimal_weights"])
     print("Final Value from min-max:", result_data_no_bounds["Final_value"])
         
         
@@ -1350,7 +1350,7 @@ result_data_with_bounds = run_experiment_no_M_with_bounds()
 print(f"========== Experiment Complete ==========")
 
 if __name__ == "__main__":
-    print("Optimal Weights:", result_data_with_bounds["Optimal_weight"])
+    print("Optimal Weights:", result_data_with_bounds["Optimal_weights"])
     print("Final Value from min-max:", result_data_with_bounds["Final_value"])
         
         
