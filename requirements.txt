@@ -7,3 +7,4 @@ plotly==6.1.1
 pulp==3.1.1
 scipy==1.15.3
 streamlit==1.45.1
+cvxpy==1.6.5
