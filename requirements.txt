@@ -1,0 +1,9 @@
+gradio==5.30.0
+gurobipy==12.0.2
+matplotlib==3.10.3
+numpy==2.2.6
+pandas==2.2.3
+plotly==6.1.1
+pulp==3.1.1
+scipy==1.15.3
+streamlit==1.45.1
