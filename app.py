@@ -30,14 +30,14 @@ iface = gr.Interface(
     fn=run_all_experiments,
     inputs=[],
     outputs=[
-        gr.outputs.Textbox(label="No Bound Results"),
-        gr.outputs.Textbox(label="With Bound Results"),
-        gr.outputs.Textbox(label="Lasso Regularization Results"),
-        gr.outputs.Textbox(label="Ridge Regularization Results")
+        gr.Textbox(label="No Bound Results"),
+        gr.Textbox(label="With Bound Results"),
+        gr.Textbox(label="Lasso Regularization Results"),
+        gr.Textbox(label="Ridge Regularization Results")
     ],
     title="Asian Option Hedging: Optimization Strategies",
     description="Click 'Evaluate' to run: No Bound, With Bound, Lasso, and Ridge experiments."
 )
 
-if __name__ == "__main__":
-    iface.launch(share=True, server_name="0.0.0.0", server_port=7860)
+
+iface.launch(share=True)

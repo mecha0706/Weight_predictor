@@ -1143,15 +1143,16 @@ def objective_value_for_stock_paths(time_point,stock_price_values, optimal_weigh
 # **EXPERIMENT 1: Run the minimization algorithm without bounds on weights**
 
 # In[35]:
-no_of_options = 4
-short_strikes = short_strike_range[:no_of_options]
+
 
 # if __name__ == "__main__":
 def run_experiment_no_M_without_bounds():
+
     """
     Runs the no-bound optimization experiment and returns a result dictionary.
     """
-
+    no_of_options = 4
+    short_strikes = short_strike_range[:no_of_options]
 
     result_data_no_bounds = run_experiment_no_M(
         solver="gurobi",
@@ -1217,31 +1218,31 @@ folder='BS_Asian_plots_MAY_2025'
 
 Weights_opt_without_bounds = result_data_no_bounds["Optimal_weights"]
 P_matrix_no_bounds = result_data_no_bounds["P_matrix"]
-if __name__ == "__main__":
-    # Weights_opt_without_bounds = result_data_no_bounds["w_opt"]
-    # P_matrix_no_bounds = result_data_no_bounds["p_matrix"]
-    plot_one_run( K1,
-    K2,
-    truncation_range,
-    N,
-    Weights_opt_without_bounds,
-    P_matrix_no_bounds,
-    marg,
-    K,
-    T_GRID,
-    sigma,
-    r,
-    short_strikes,
-    run_idx=None,
-    save=True,
-    folder=folder,
-    fname='Conditional_plot_no_bounds_zoomed_in',
-    show=True,
-    asian_payoff=Asian_option_payoff,
-    bs_call=BS_call,
-    lo = 2,
-    hi = -2
-)
+# if __name__ == "__main__":
+#     # Weights_opt_without_bounds = result_data_no_bounds["w_opt"]
+#     # P_matrix_no_bounds = result_data_no_bounds["p_matrix"]
+#     plot_one_run( K1,
+#     K2,
+#     truncation_range,
+#     N,
+#     Weights_opt_without_bounds,
+#     P_matrix_no_bounds,
+#     marg,
+#     K,
+#     T_GRID,
+#     sigma,
+#     r,
+#     short_strikes,
+#     run_idx=None,
+#     save=True,
+#     folder=folder,
+#     fname='Conditional_plot_no_bounds_zoomed_in',
+#     show=True,
+#     asian_payoff=Asian_option_payoff,
+#     bs_call=BS_call,
+#     lo = 2,
+#     hi = -2
+# )
     
 
 
@@ -1254,36 +1255,40 @@ if __name__ == "__main__":
 # In[ ]:
 
 
-truncation_range =2
-
-N=19
-choice ="non-uniform"
-no_of_options =2 
-disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals( truncation_range=truncation_range,\
-                                                                               N=N,choice=choice)
-    
-
-K1 = disc_points_new[0]
-
-K2 = disc_points_new[1]
-
-# Pick short strikes
-short_strikes = short_strike_range[:no_of_options] 
-    
-# print(f"Short strikes: {short_strikes}")        #commented by me
-
-# Compute  short calls
-
-short_call = get_short_call(T_GRID, T_GRID[1], no_of_options, marg, disc_points_new, short_strikes)
 # print(f"length of short_call {len(short_call)}")        #commented by me
 
 
 # In[ ]:
 
 
-M_bound = 0
-Weights_min_prev = [1] *(no_of_options+1)
-result = solve_max_problem_gurobi_without_M(M_bound,
+
+
+def result():
+    truncation_range =2
+
+    N=19
+    choice ="non-uniform"
+    no_of_options =2 
+
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals( truncation_range=truncation_range,\
+                                                                               N=N,choice=choice)
+    
+
+    K1 = disc_points_new[0]
+
+    K2 = disc_points_new[1]
+
+# Pick short strikes
+    short_strikes = short_strike_range[:no_of_options] 
+    
+# print(f"Short strikes: {short_strikes}")        #commented by me
+
+# Compute  short calls
+
+    short_call = get_short_call(T_GRID, T_GRID[1], no_of_options, marg, disc_points_new, short_strikes)
+    M_bound = 0
+    Weights_min_prev = [1] *(no_of_options+1)
+    solve_max_problem_gurobi_without_M(M_bound,
     K1,
     K2,
     Weights_min_prev,
@@ -1294,10 +1299,11 @@ result = solve_max_problem_gurobi_without_M(M_bound,
     0,)
 
 
+
 # In[ ]:
 
 
-result['P_slack']
+# result['P_slack']  commented by me
 
 
 # **EXPERIMENT 2: Run the minimization algorithm with bounds on weights**
@@ -1401,6 +1407,8 @@ P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
     
 lmda_reg = 0.043
 def run_experiment_with_ridge():
+    no_of_options = 4
+    short_strikes = short_strike_range[:no_of_options]
     list_of_objectives = []
     list_of_dictionaries = []
     regularization = "ridge"
@@ -1451,29 +1459,29 @@ print("Final Value from min-max:", result_data_with_ridge["Final_value"])
 Weights_opt_with_ridge = result_data_with_ridge["Optimal_weights"]
 P_matrix_with_ridge = result_data_with_ridge["P_matrix"]
 
-if __name__ == "__main__":
-    plot_one_run( K1,
-    K2,
-    truncation_range,
-    N,
-    Weights_opt_with_ridge,
-    P_matrix_with_ridge,
-    marg,
-    K,
-    T_GRID,
-    sigma,
-    r,
-    short_strikes,
-    run_idx=None,
-    save=True,
-    folder='BS_Asian_plots_MAY_2025',
-    fname='Conditional_plot_with_ridge_zoomed_in',        
-    show=True,
-    asian_payoff=Asian_option_payoff,
-    bs_call=BS_call,
-    lo = 2,
-    hi = -2
-)
+# if __name__ == "__main__":
+#     plot_one_run( K1,
+#     K2,
+#     truncation_range,
+#     N,
+#     Weights_opt_with_ridge,
+#     P_matrix_with_ridge,
+#     marg,
+#     K,
+#     T_GRID,
+#     sigma,
+#     r,
+#     short_strikes,
+#     run_idx=None,
+#     save=True,
+#     folder='BS_Asian_plots_MAY_2025',
+#     fname='Conditional_plot_with_ridge_zoomed_in',        
+#     show=True,
+#     asian_payoff=Asian_option_payoff,
+#     bs_call=BS_call,
+#     lo = 2,
+#     hi = -2
+# )
     
 
 
@@ -1494,6 +1502,8 @@ if __name__ == "__main__":
     
 lmda_reg = 0.005
 def run_experiment_with_lasso():
+    no_of_options = 4
+    short_strikes = short_strike_range[:no_of_options]
     list_of_objectives = []
     list_of_dictionaries = []   
     result_data_with_lasso = run_experiment_no_M(solver="gurobi",
@@ -1543,30 +1553,30 @@ print("Final Value from min-max:", result_data_with_lasso["Final_value"])
 Weights_opt_with_lasso = result_data_with_lasso["Optimal_weights"]
 P_matrix_with_lasso = result_data_with_lasso["P_matrix"]
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    plot_one_run( K1,
-    K2,
-    truncation_range,
-    N,
-    Weights_opt_with_lasso,
-    P_matrix_with_lasso,
-    marg,
-    K,
-    T_GRID,
-    sigma,
-    r,
-    short_strikes,
-    run_idx=None,
-    save=False,
-    folder='BS_Asian_plots_MAY_2025',
-    fname='Conditional_plot_with_lasso',        
-    show=True,
-    asian_payoff=Asian_option_payoff,
-    bs_call=BS_call,
-#     lo = 2,
-#     hi = -2         
-)
+#     plot_one_run( K1,
+#     K2,
+#     truncation_range,
+#     N,
+#     Weights_opt_with_lasso,
+#     P_matrix_with_lasso,
+#     marg,
+#     K,
+#     T_GRID,
+#     sigma,
+#     r,
+#     short_strikes,
+#     run_idx=None,
+#     save=False,
+#     folder='BS_Asian_plots_MAY_2025',
+#     fname='Conditional_plot_with_lasso',        
+#     show=True,
+#     asian_payoff=Asian_option_payoff,
+#     bs_call=BS_call,
+# #     lo = 2,
+# #     hi = -2         
+# )
 
 
 
@@ -1579,288 +1589,288 @@ if __name__ == "__main__":
 # In[ ]:
 
 #store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
-objective_value_list_intermediate_time_no_bounds = np.zeros((index1+1,Nsim))
+# objective_value_list_intermediate_time_no_bounds = np.zeros((index1+1,Nsim))
 
-for i in range(index1+1):
-        for j in range(len(stock_paths[:,i])):
-             #objective value at the intermediate time points
-            objective_value_list_intermediate_time_no_bounds[i,j] = objective_value_for_stock_paths(time_indices[i],
-                                                         stock_paths[j,i],
-                                                         Weights_opt_without_bounds,
-                                                         T_GRID,K,
-                                                         short_strikes)
+# for i in range(index1+1):
+#         for j in range(len(stock_paths[:,i])):
+#              #objective value at the intermediate time points
+#             objective_value_list_intermediate_time_no_bounds[i,j] = objective_value_for_stock_paths(time_indices[i],
+#                                                          stock_paths[j,i],
+#                                                          Weights_opt_without_bounds,
+#                                                          T_GRID,K,
+#                                                          short_strikes)
         
 
 
-# In[ ]:
+# # In[ ]:
 
 
-#store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
-objective_value_list_intermediate_time_with_bounds = np.zeros((index1+1,Nsim))
+# #store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
+# objective_value_list_intermediate_time_with_bounds = np.zeros((index1+1,Nsim))
 
-for i in range(index1+1):
-        for j in range(len(stock_paths[:,i])):
-             #objective value at the intermediate time points
-            objective_value_list_intermediate_time_with_bounds[i,j] = objective_value_for_stock_paths(time_indices[i],
-                                                         stock_paths[j,i],
-                                                         Weights_opt_with_bounds,
-                                                         T_GRID,K,
-                                                         short_strikes)
-
-
-# In[ ]:
+# for i in range(index1+1):
+#         for j in range(len(stock_paths[:,i])):
+#              #objective value at the intermediate time points
+#             objective_value_list_intermediate_time_with_bounds[i,j] = objective_value_for_stock_paths(time_indices[i],
+#                                                          stock_paths[j,i],
+#                                                          Weights_opt_with_bounds,
+#                                                          T_GRID,K,
+#                                                          short_strikes)
 
 
-#store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
-objective_value_list_intermediate_time_with_ridge = np.zeros((index1+1,Nsim))
-
-for i in range(index1+1):
-        for j in range(len(stock_paths[:,i])):
-             #objective value at the intermediate time points
-            objective_value_list_intermediate_time_with_ridge[i,j] = objective_value_for_stock_paths(time_indices[i],
-                                                         stock_paths[j,i],
-                                                         Weights_opt_with_ridge,
-                                                         T_GRID,K,
-                                                         short_strikes)
+# # In[ ]:
 
 
-# In[ ]:
+# #store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
+# objective_value_list_intermediate_time_with_ridge = np.zeros((index1+1,Nsim))
+
+# for i in range(index1+1):
+#         for j in range(len(stock_paths[:,i])):
+#              #objective value at the intermediate time points
+#             objective_value_list_intermediate_time_with_ridge[i,j] = objective_value_for_stock_paths(time_indices[i],
+#                                                          stock_paths[j,i],
+#                                                          Weights_opt_with_ridge,
+#                                                          T_GRID,K,
+#                                                          short_strikes)
 
 
-#store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
-objective_value_list_intermediate_time_with_lasso = np.zeros((index1+1,Nsim))
-
-for i in range(index1+1):
-        for j in range(len(stock_paths[:,i])):
-             #objective value at the intermediate time points
-            objective_value_list_intermediate_time_with_lasso[i,j] = objective_value_for_stock_paths(time_indices[i],
-                                                         stock_paths[j,i],
-                                                         Weights_opt_with_lasso,
-                                                         T_GRID,K,
-                                                         short_strikes)
+# # In[ ]:
 
 
-# In[ ]:
+# #store the objective value for each stock path simulation till short maturity i.e. time_indices[index1]
+# objective_value_list_intermediate_time_with_lasso = np.zeros((index1+1,Nsim))
+
+# for i in range(index1+1):
+#         for j in range(len(stock_paths[:,i])):
+#              #objective value at the intermediate time points
+#             objective_value_list_intermediate_time_with_lasso[i,j] = objective_value_for_stock_paths(time_indices[i],
+#                                                          stock_paths[j,i],
+#                                                          Weights_opt_with_lasso,
+#                                                          T_GRID,K,
+#                                                          short_strikes)
 
 
-#list to store the objective values
-
-objective_value_full_list_for_diff_methods = [objective_value_list_intermediate_time_no_bounds,
-                                         objective_value_list_intermediate_time_with_bounds,
-                                         objective_value_list_intermediate_time_with_ridge,
-                                         objective_value_list_intermediate_time_with_lasso]
+# # In[ ]:
 
 
-#list to store the min-max values for the four methods
-min_max_list_for_different_methods = [result_data_no_bounds["final_value"],
-                                      result_data_with_bounds["final_value"],
-                                      result_data_with_lasso["final_value"],
-                                      result_data_with_ridge["final_value"]]
+# #list to store the objective values
 
-#list to store the weights
-optimal_weights_list = [Weights_opt_without_bounds,
-                        Weights_opt_with_bounds,
-                        Weights_opt_with_ridge,
-                        Weights_opt_with_lasso]
+# objective_value_full_list_for_diff_methods = [objective_value_list_intermediate_time_no_bounds,
+#                                          objective_value_list_intermediate_time_with_bounds,
+#                                          objective_value_list_intermediate_time_with_ridge,
+#                                          objective_value_list_intermediate_time_with_lasso]
 
 
-#list to store the methods used
-methods_list = ["no bounds","with bounds", "ridge", "lasso"]
+# #list to store the min-max values for the four methods
+# min_max_list_for_different_methods = [result_data_no_bounds["final_value"],
+#                                       result_data_with_bounds["final_value"],
+#                                       result_data_with_lasso["final_value"],
+#                                       result_data_with_ridge["final_value"]]
+
+# #list to store the weights
+# optimal_weights_list = [Weights_opt_without_bounds,
+#                         Weights_opt_with_bounds,
+#                         Weights_opt_with_ridge,
+#                         Weights_opt_with_lasso]
 
 
-# In[ ]:
+# #list to store the methods used
+# methods_list = ["no bounds","with bounds", "ridge", "lasso"]
 
 
-#Compute the maximum/peak PFEs with respect to each weight combination till short maturity
+# # In[ ]:
 
-peak_PFE_99_list = []
-peak_PFE_95_list = []
-peak_PFE_5_list = []
-peak_PFE_1_list = []
-mean_absolute_error_list = []
+
+# #Compute the maximum/peak PFEs with respect to each weight combination till short maturity
+
+# peak_PFE_99_list = []
+# peak_PFE_95_list = []
+# peak_PFE_5_list = []
+# peak_PFE_1_list = []
+# mean_absolute_error_list = []
 
     
-for i,element in enumerate(objective_value_full_list_for_diff_methods):#get the index and the corresponding element from the list
+# for i,element in enumerate(objective_value_full_list_for_diff_methods):#get the index and the corresponding element from the list
     
-    # print(f"The optimal weights for {i+1} options are:{optimal_weights_list[i]}")         #commented by me
+#     # print(f"The optimal weights for {i+1} options are:{optimal_weights_list[i]}")         #commented by me
     
-    #print the shape of the the ith element: should be index1 x Nsim
-    # print(f"Shape of the {i}th element:{element.shape}")          #commented by me
+#     #print the shape of the the ith element: should be index1 x Nsim
+#     # print(f"Shape of the {i}th element:{element.shape}")          #commented by me
     
-    #compute the PFEs at each time point till short maturity
-    ninety_nine_percentile_list = np.percentile(element,99, axis=1)
-    ninety_fifth_percentile_list = np.percentile(element,95,axis=1) 
-    fifth_percentile_list = np.percentile(element,5,axis=1)
-    first_percentile_list = np.percentile(element,1,axis=1) 
-    mean_of_absolute_error = np.mean(np.abs(element),axis=1) 
+#     #compute the PFEs at each time point till short maturity
+#     ninety_nine_percentile_list = np.percentile(element,99, axis=1)
+#     ninety_fifth_percentile_list = np.percentile(element,95,axis=1) 
+#     fifth_percentile_list = np.percentile(element,5,axis=1)
+#     first_percentile_list = np.percentile(element,1,axis=1) 
+#     mean_of_absolute_error = np.mean(np.abs(element),axis=1) 
     
-    #compute the peak PFEs
-    peak_PFE_99 = np.max(ninety_nine_percentile_list)
-    peak_PFE_95 = np.max(ninety_fifth_percentile_list)
-    peak_PFE_5 = np.min(fifth_percentile_list)
-    peak_PFE_1 = np.min(first_percentile_list)
-    peak_mean_absolute_error = mean_of_absolute_error[-1] 
+#     #compute the peak PFEs
+#     peak_PFE_99 = np.max(ninety_nine_percentile_list)
+#     peak_PFE_95 = np.max(ninety_fifth_percentile_list)
+#     peak_PFE_5 = np.min(fifth_percentile_list)
+#     peak_PFE_1 = np.min(first_percentile_list)
+#     peak_mean_absolute_error = mean_of_absolute_error[-1] 
     
-#     print(f"Peak mean absolute error is: {peak_mean_absolute_error}")
-#     print(mean_of_absolute_error[-1])
+# #     print(f"Peak mean absolute error is: {peak_mean_absolute_error}")
+# #     print(mean_of_absolute_error[-1])
    
-    peak_PFE_99_list.append(peak_PFE_99)
-    peak_PFE_95_list.append(peak_PFE_95)
-    peak_PFE_5_list.append(peak_PFE_5)
-    peak_PFE_1_list.append(peak_PFE_1)
-    mean_absolute_error_list.append(mean_of_absolute_error[-1])
+#     peak_PFE_99_list.append(peak_PFE_99)
+#     peak_PFE_95_list.append(peak_PFE_95)
+#     peak_PFE_5_list.append(peak_PFE_5)
+#     peak_PFE_1_list.append(peak_PFE_1)
+#     mean_absolute_error_list.append(mean_of_absolute_error[-1])
     
     
 
 
-# In[ ]:
+# # In[ ]:
 
 
-plt.plot(methods_list,peak_PFE_99_list,label='99 level VAR')
-plt.plot(methods_list,peak_PFE_95_list,label='95 level VAR')
-plt.plot(methods_list,peak_PFE_5_list,label='5 level VAR')
-plt.plot(methods_list,peak_PFE_1_list,label='1 level VAR')
-plt.xticks(methods_list)
-plt.xlabel("Methods used")
-plt.title(f"Peak PFEs till short_maturity {T_GRID[1]}")
-plt.legend()
-plt.show()
-plt.close()
+# plt.plot(methods_list,peak_PFE_99_list,label='99 level VAR')
+# plt.plot(methods_list,peak_PFE_95_list,label='95 level VAR')
+# plt.plot(methods_list,peak_PFE_5_list,label='5 level VAR')
+# plt.plot(methods_list,peak_PFE_1_list,label='1 level VAR')
+# plt.xticks(methods_list)
+# plt.xlabel("Methods used")
+# plt.title(f"Peak PFEs till short_maturity {T_GRID[1]}")
+# plt.legend()
+# plt.show()
+# plt.close()
 
 
-# In[ ]:
+# # In[ ]:
 
 
-#Plot the mean absolute errors and the objective values of the minmax for the four methods
-import matplotlib.pyplot as plt
+# #Plot the mean absolute errors and the objective values of the minmax for the four methods
+# import matplotlib.pyplot as plt
 
-# --------------------------------------------------------------------
-# data  (already in your workspace)
-# methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
-# peak_PFE_99_list          = [...]
-# peak_PFE_95_list          = [...]
-# peak_PFE_5_list           = [...]
-# peak_PFE_1_list           = [...]
-# --------------------------------------------------------------------
+# # --------------------------------------------------------------------
+# # data  (already in your workspace)
+# # methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
+# # peak_PFE_99_list          = [...]
+# # peak_PFE_95_list          = [...]
+# # peak_PFE_5_list           = [...]
+# # peak_PFE_1_list           = [...]
+# # --------------------------------------------------------------------
 
-# map each list to a nicer name to loop easily
-series = [
-    ("Mean Absolute Error", mean_absolute_error_list, "tab:blue"),
-    ("Min-Max objective value",min_max_list_for_different_methods , "tab:orange"),
-]
+# # map each list to a nicer name to loop easily
+# series = [
+#     ("Mean Absolute Error", mean_absolute_error_list, "tab:blue"),
+#     ("Min-Max objective value",min_max_list_for_different_methods , "tab:orange"),
+# ]
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 6), sharex=True)
-axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
+# fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 6), sharex=True)
+# axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
 
-for ax, (title, values, colour) in zip(axes, series):
-    ax.bar(methods_list, values, color=colour)
-    ax.set_title(title)
-    ax.set_ylabel("value")
-    ax.set_xticklabels(methods_list, rotation=15, ha="right")
+# for ax, (title, values, colour) in zip(axes, series):
+#     ax.bar(methods_list, values, color=colour)
+#     ax.set_title(title)
+#     ax.set_ylabel("value")
+#     ax.set_xticklabels(methods_list, rotation=15, ha="right")
 
-fig.suptitle(f"Objective values versus mean absolute errors at short_maturity {T_GRID[1]}")
-fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
-plt.savefig(f"{folder}/min-max vs MAE till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
+# fig.suptitle(f"Objective values versus mean absolute errors at short_maturity {T_GRID[1]}")
+# fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
+# plt.savefig(f"{folder}/min-max vs MAE till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
 
-# ------------- append a tiny CSV log -----------------------------
-logfile = Path(folder) / "plot_index.csv"
-plt.show()
-
-
-# In[ ]:
+# # ------------- append a tiny CSV log -----------------------------
+# logfile = Path(folder) / "plot_index.csv"
+# plt.show()
 
 
-#PLOT THE PFEs of the four methods
-
-import matplotlib.pyplot as plt
-
-# --------------------------------------------------------------------
-# data  (already in your workspace)
-# methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
-# peak_PFE_99_list          = [...]
-# peak_PFE_95_list          = [...]
-# peak_PFE_5_list           = [...]
-# peak_PFE_1_list           = [...]
-# --------------------------------------------------------------------
-
-# map each list to a nicer name to loop easily
-series = [
-    ("99th percentile", peak_PFE_99_list, "tab:blue"),
-    ("95th percentile", peak_PFE_95_list, "tab:orange"),
-    ("5th percentile",  peak_PFE_5_list,  "tab:green"),
-    ("1st percentile",  peak_PFE_1_list,  "tab:red"),
-]
-
-fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(9, 6), sharex=True)
-axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
-
-for ax, (title, values, colour) in zip(axes, series):
-    ax.bar(methods_list, values, color=colour)
-    ax.set_title(title)
-    ax.set_ylabel("value")
-    ax.set_xticklabels(methods_list, rotation=15, ha="right")
-
-fig.suptitle(f"Peak PFEs till short_maturity {T_GRID[1]}")
-fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
-plt.savefig(f"{folder}/Peak PFEs till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
-
-# ------------- append a tiny CSV log -----------------------------
-logfile = Path(folder) / "plot_index.csv"
-plt.show()
+# # In[ ]:
 
 
-# In[ ]:
+# #PLOT THE PFEs of the four methods
+
+# import matplotlib.pyplot as plt
+
+# # --------------------------------------------------------------------
+# # data  (already in your workspace)
+# # methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
+# # peak_PFE_99_list          = [...]
+# # peak_PFE_95_list          = [...]
+# # peak_PFE_5_list           = [...]
+# # peak_PFE_1_list           = [...]
+# # --------------------------------------------------------------------
+
+# # map each list to a nicer name to loop easily
+# series = [
+#     ("99th percentile", peak_PFE_99_list, "tab:blue"),
+#     ("95th percentile", peak_PFE_95_list, "tab:orange"),
+#     ("5th percentile",  peak_PFE_5_list,  "tab:green"),
+#     ("1st percentile",  peak_PFE_1_list,  "tab:red"),
+# ]
+
+# fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(9, 6), sharex=True)
+# axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
+
+# for ax, (title, values, colour) in zip(axes, series):
+#     ax.bar(methods_list, values, color=colour)
+#     ax.set_title(title)
+#     ax.set_ylabel("value")
+#     ax.set_xticklabels(methods_list, rotation=15, ha="right")
+
+# fig.suptitle(f"Peak PFEs till short_maturity {T_GRID[1]}")
+# fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
+# plt.savefig(f"{folder}/Peak PFEs till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
+
+# # ------------- append a tiny CSV log -----------------------------
+# logfile = Path(folder) / "plot_index.csv"
+# plt.show()
 
 
-#PLOT THE PFEs of the four methods
+# # In[ ]:
 
-import matplotlib.pyplot as plt
-from datetime import datetime
 
-# --------------------------------------------------------------------
-# data  (already in your workspace)
-# methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
-# peak_PFE_99_list          = [...]
-# peak_PFE_95_list          = [...]
-# peak_PFE_5_list           = [...]
-# peak_PFE_1_list           = [...]
-# --------------------------------------------------------------------
+# #PLOT THE PFEs of the four methods
 
-# map each list to a nicer name to loop easily
-series = [
-    ("99 level VAR", peak_PFE_99_list, "tab:blue"),
-    ("95 level VAR", peak_PFE_95_list, "tab:orange"),
-]
+# import matplotlib.pyplot as plt
+# from datetime import datetime
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 6), sharex=True)
-axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
+# # --------------------------------------------------------------------
+# # data  (already in your workspace)
+# # methods_list              = ['no bounds', 'with bounds', 'ridge', 'lasso']
+# # peak_PFE_99_list          = [...]
+# # peak_PFE_95_list          = [...]
+# # peak_PFE_5_list           = [...]
+# # peak_PFE_1_list           = [...]
+# # --------------------------------------------------------------------
 
-for ax, (title, values, colour) in zip(axes, series):
-    ax.bar(methods_list, values, color=colour)
-    ax.set_title(title)
-    ax.set_ylabel("value")
-    ax.set_xticklabels(methods_list, rotation=15, ha="right")
+# # map each list to a nicer name to loop easily
+# series = [
+#     ("99 level VAR", peak_PFE_99_list, "tab:blue"),
+#     ("95 level VAR", peak_PFE_95_list, "tab:orange"),
+# ]
 
-#Add a time_stamp to prevent accidental overwriting    
- # timestamp: YYYY-MM-DD_HHMMSS
-ts  = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+# fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 6), sharex=True)
+# axes = axes.ravel()                       # flatten 2×2 → 1-D iterator
+
+# for ax, (title, values, colour) in zip(axes, series):
+#     ax.bar(methods_list, values, color=colour)
+#     ax.set_title(title)
+#     ax.set_ylabel("value")
+#     ax.set_xticklabels(methods_list, rotation=15, ha="right")
+
+# #Add a time_stamp to prevent accidental overwriting    
+#  # timestamp: YYYY-MM-DD_HHMMSS
+# ts  = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     
-fig.suptitle(f"Peak PFEs till short_maturity {T_GRID[1]}")
-fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
-plt.savefig(f"{folder}/{ts} VAR till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
+# fig.suptitle(f"Peak PFEs till short_maturity {T_GRID[1]}")
+# fig.tight_layout(rect=[0, 0.03, 1, 0.95])   # leave room for suptitle
+# plt.savefig(f"{folder}/{ts} VAR till short_maturity {T_GRID[1]}.png", dpi=300, bbox_inches="tight")
 
-# ------------- append a tiny CSV log -----------------------------
-logfile = Path(folder) / "plot_index.csv"
-plt.show()
-
-
-# In[ ]:
+# # ------------- append a tiny CSV log -----------------------------
+# logfile = Path(folder) / "plot_index.csv"
+# plt.show()
 
 
-# get_ipython().system('zip -r BS_Asian_plots_MAY_2025.zip BS_Asian_plots_MAY_2025')
+# # In[ ]:
 
 
-# In[ ]:
+# # get_ipython().system('zip -r BS_Asian_plots_MAY_2025.zip BS_Asian_plots_MAY_2025')
+
+
+# # In[ ]:
 
 
 
