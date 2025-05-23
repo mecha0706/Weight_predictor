@@ -131,7 +131,7 @@ def get_disc_points_and_marginals(truncation_range=None,n=None, N=None,choice="u
         
         #getting the new discretization points
         disc_points_new = disc_points_new_1(K1_new,K2_new)
-        print(f"The new discretization points are:{disc_points_new}")
+        # print(f"The new discretization points are:{disc_points_new}") commented by me
         
         # store the call prices as a 2D array
         call_prices_array_new = np.vstack((call_prices(stock,D,K1_new,T_GRID[1],sigma,r),
@@ -159,11 +159,12 @@ def get_disc_points_and_marginals(truncation_range=None,n=None, N=None,choice="u
         
          #next we find the point where the interpolated line joining the last two strike points takes value zero
         R_0_T1 = find_zero(BS_call,stock,grid,T_GRID[1],sigma,r)
-        print(f"The strike for time {T_GRID[1]} is {R_0_T1} and interpolated call value: {interpolated_line(stock,grid,T_GRID[1],sigma,r,R_0_T1)}")
-        
+        # print(f"The strike for time {T_GRID[1]} is {R_0_T1} and interpolated call value: {interpolated_line(stock,grid,T_GRID[1],sigma,r,R_0_T1)}")
+        #commented by me
+
         R_0_T = find_zero(BS_call,stock,grid,T,sigma,r)
-        print(f"The strike for time {T} is {R_0_T} and interpolated call value: {interpolated_line(stock,grid,T,sigma,r,R_0_T)}")
-        
+        # print(f"The strike for time {T} is {R_0_T} and interpolated call value: {interpolated_line(stock,grid,T,sigma,r,R_0_T)}")
+                #commented by me
         R_0 = max(R_0_T1,R_0_T)
         
 #         #next we find the point where the interpolated line joining the last two strike points takes value zero
@@ -180,8 +181,8 @@ def get_disc_points_and_marginals(truncation_range=None,n=None, N=None,choice="u
         
         #getting the new discretization points
         disc_points_new = disc_points_new_1(K1_new,K2_new)
-        print(f"The new discretization points are:{disc_points_new}")
-        print(f"Number of discretization points are:{len(K1_new)}")
+        # print(f"The new discretization points are:{disc_points_new}")          #commented by me
+        # print(f"Number of discretization points are:{len(K1_new)}")        #commented by me
         
                 
         # store the call prices as a 2D array
@@ -236,7 +237,7 @@ def get_short_call(t1,short_maturity,no_of_options,marg,disc_points_new,short_st
     for j in range(no_of_options):
         short_call[j] = sum(marg[L-1,i] * np.maximum(disc_points_new[L-1,i]-short_strikes[j],0) \
                             for i in range(N))
-        print("Short call value", str(j),"is:",short_call[j])
+        # print("Short call value", str(j),"is:",short_call[j])        #commented by me
     return short_call
 
 
@@ -683,12 +684,12 @@ def run_experiment_no_M(solver=None,
    
     # Pick short strikes
     
-    print(f"Short strikes: {short_strikes}")
+    # print(f"Short strikes: {short_strikes}")          #commented by me
 
     # Compute  short calls
 
     short_call = get_short_call(T_GRID, T_GRID[1], no_of_options, marg, disc_points_new, short_strikes)
-    print(f"length of short_call {len(short_call)}")
+    # print(f"length of short_call {len(short_call)}")         #commented by me
 
     
 
@@ -821,7 +822,7 @@ short_strike_range = [round(float(disc_points_new[0][7]),4),
                  round(float(disc_points_new[0][4]),4),
                  round(float(disc_points_new[0][11]),4)]
 
-print(f"\n The available short strikes are: { short_strike_range}")
+# print(f"\n The available short strikes are: { short_strike_range}")          #commented by me
 
 
 # In[29]:
@@ -951,9 +952,8 @@ def plot_one_run(
             0.5 * bs_call(k1, -k1 + 2*K, T_GRID[1], T_GRID[-1], sigma, r)
             if 2*K - k1 >= 0 else k1 - K
         )
-
-        hedge[i] = cash + np.sum(
-            wopt * np.maximum(k1 - short_strikes[:m], 0.0))
+        # hedge[i] = cash + np.sum(
+        #     wopt * np.maximum(k1 - short_strikes[:m], 0.0))
 
     # ------------------------------------------------------------------ #
     # 3.  Plot
@@ -1034,9 +1034,9 @@ for i in range(Nsteps):
 index1 = time_indices.index(T_GRID[1]) #index corresponding to short maturity
 index2 = time_indices.index(T) #index corresponding to target maturity
 
-print(f"Index corresponding to short maturity {time_indices[index1]} :{index1}")
+# print(f"Index corresponding to short maturity {time_indices[index1]} :{index1}")         #commented by me
     
-print(f"Index corresponding to target maturity {time_indices[index2]} :{index2}")
+# print(f"Index corresponding to target maturity {time_indices[index2]} :{index2}")         #commented by me
     
     #plot the stock paths
 t_paths = np.linspace(0, Nsteps, Nsteps+1)
@@ -1045,7 +1045,7 @@ plt.show()
 plt.close()
     
     #print the intermediate time points
-print(f"Time indices:\n {time_indices}")
+# print(f"Time indices:\n {time_indices}")          #commented by me
     
 
 
@@ -1184,10 +1184,8 @@ def run_experiment_no_M_without_bounds():
 
 result_data_no_bounds = run_experiment_no_M_without_bounds()
 print(f"========== Experiment Complete ==========")
-
-if __name__ == "__main__":
-    print("Optimal Weights:", result_data_no_bounds["Optimal_weights"])
-    print("Final Value from min-max:", result_data_no_bounds["Final_value"])
+print("Optimal Weights:", result_data_no_bounds["Optimal_weights"])
+print("Final Value from min-max:", result_data_no_bounds["Final_value"])
         
         
 #         current_objective = result_data_no_bounds["final_value"]
@@ -1272,12 +1270,12 @@ K2 = disc_points_new[1]
 # Pick short strikes
 short_strikes = short_strike_range[:no_of_options] 
     
-print(f"Short strikes: {short_strikes}")
+# print(f"Short strikes: {short_strikes}")        #commented by me
 
 # Compute  short calls
 
 short_call = get_short_call(T_GRID, T_GRID[1], no_of_options, marg, disc_points_new, short_strikes)
-print(f"length of short_call {len(short_call)}")
+# print(f"length of short_call {len(short_call)}")        #commented by me
 
 
 # In[ ]:
@@ -1348,10 +1346,8 @@ def run_experiment_no_M_with_bounds():
     return run_dict_with_bounds
 result_data_with_bounds = run_experiment_no_M_with_bounds()
 print(f"========== Experiment Complete ==========")
-
-if __name__ == "__main__":
-    print("Optimal Weights:", result_data_with_bounds["Optimal_weights"])
-    print("Final Value from min-max:", result_data_with_bounds["Final_value"])
+print("Optimal Weights:", result_data_with_bounds["Optimal_weights"])
+print("Final Value from min-max:", result_data_with_bounds["Final_value"])
         
         
 
@@ -1362,28 +1358,28 @@ if __name__ == "__main__":
 #PLOT AND CHECK HOW IT LOOKS
 Weights_opt_with_bounds = result_data_with_bounds["Optimal_weights"]
 P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
-if __name__ == "__main__":
-    plot_one_run(
-    K1,
-    K2,
-    truncation_range,
-    N,
-    Weights_opt_with_bounds,
-    P_matrix_with_bounds,
-    marg,
-    K,
-    T_GRID,
-    sigma,
-    r,
-    short_strikes,
-    run_idx=None,
-    save=True,
-    folder='BS_Asian_plots_MAY_2025',
-    fname='Conditional_plot_with_bounds',
-    show=True,
-    asian_payoff=Asian_option_payoff,
-    bs_call=BS_call
-)
+# if __name__ == "__main__":            #commented by me
+#     plot_one_run(
+#     K1,
+#     K2,
+#     truncation_range,
+#     N,
+#     Weights_opt_with_bounds,
+#     P_matrix_with_bounds,
+#     marg,
+#     K,
+#     T_GRID,
+#     sigma,
+#     r,
+#     short_strikes,
+#     run_idx=None,
+#     save=True,
+#     folder='BS_Asian_plots_MAY_2025',
+#     fname='Conditional_plot_with_bounds',
+#     show=True,
+#     asian_payoff=Asian_option_payoff,
+#     bs_call=BS_call
+# )
        
 
 
@@ -1442,9 +1438,8 @@ def run_experiment_with_ridge():
     return run_dict_with_ridge
 result_data_with_ridge = run_experiment_with_ridge()
 print(f"========== Experiment Complete ==========")
-if __name__ == "__main__":
-    print("Optimal Weights:", result_data_with_ridge["Optimal_weights"])
-    print("Final Value from min-max:", result_data_with_ridge["Final_value"])
+print("Optimal Weights:", result_data_with_ridge["Optimal_weights"])
+print("Final Value from min-max:", result_data_with_ridge["Final_value"])
         
         
 
@@ -1535,9 +1530,8 @@ def run_experiment_with_lasso():
     return run_dict_with_lasso
 result_data_with_lasso = run_experiment_with_lasso()
 print(f"========== Experiment Complete ==========")
-if __name__ == "__main__":
-    print("Optimal Weights:", result_data_with_lasso["Optimal_weights"])
-    print("Final Value from min-max:", result_data_with_lasso["Final_value"])
+print("Optimal Weights:", result_data_with_lasso["Optimal_weights"])
+print("Final Value from min-max:", result_data_with_lasso["Final_value"])
         
         
 
@@ -1688,10 +1682,10 @@ mean_absolute_error_list = []
     
 for i,element in enumerate(objective_value_full_list_for_diff_methods):#get the index and the corresponding element from the list
     
-    print(f"The optimal weights for {i+1} options are:{optimal_weights_list[i]}")
+    # print(f"The optimal weights for {i+1} options are:{optimal_weights_list[i]}")         #commented by me
     
     #print the shape of the the ith element: should be index1 x Nsim
-    print(f"Shape of the {i}th element:{element.shape}")
+    # print(f"Shape of the {i}th element:{element.shape}")          #commented by me
     
     #compute the PFEs at each time point till short maturity
     ninety_nine_percentile_list = np.percentile(element,99, axis=1)
