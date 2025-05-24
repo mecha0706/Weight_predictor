@@ -108,4 +108,4 @@ with gr.Blocks() as demo:
     show_btn.click(get_strike_choices, inputs=K, outputs=strike_choices)
     run_btn.click(run_all_experiments, inputs=[K, no_of_options, indices_str], outputs=[out1, out2, out3, out4])
 
-demo.launch()
+demo.launch(share=True)
