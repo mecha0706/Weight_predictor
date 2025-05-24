@@ -39,10 +39,9 @@ print("License ID:", model.getParamInfo("LicenseID"))
 
 
 #common parameters for all the experiments/GLOBAL VARIABLES
+ #number of options in the hedge portfolio
 
 stock = 1 #initial stock price
-
-K = 1 # target option's strike price
 
 r = 0 #risk-free rate of interest
 
@@ -60,6 +59,8 @@ timepoints =2 #number of timesteps
 T_GRID = [0,0.5,T]#times at which the marginals of the stock price are evaluated
 
 short_maturity = T_GRID[1] # maturity of the options in the hedge portfolio
+if __name__ == "__main__":
+    K = 1 # target option's strike price
 
 
 #short_strike_range = [1,1.1,0.9,1.2,0.8,1.25,1.05,0.85,]#range of short strikes for increasing number of options
@@ -93,7 +94,7 @@ def Asian_option_payoff(stock_price_t1,stock_price_T,strike_price):
 
 #function to return the discretization points, call prices and the marginals for a given value of truncation range and number of discretization points and choice of uniform or nonuniform grid
 
-def get_disc_points_and_marginals(truncation_range=None,n=None, N=None,choice="uniform"):
+def get_disc_points_and_marginals(K,truncation_range=None,n=None, N=None,choice="uniform"):
     """
        Generate the discretization points for the given problem depending on uniform or non-uniform grid
        Parameters: 
@@ -651,7 +652,7 @@ def check_constraints_pulp_solution_no_M(
 #  MAIN DRIVER (run_experiment) 
 ###############################################################################
     # Build grid & marginals
-def run_experiment_no_M(solver=None,
+def run_experiment_no_M(K,solver=None,
     truncation_range=None,
     n=None,
     N=None,
@@ -674,7 +675,7 @@ def run_experiment_no_M(solver=None,
      4) Solve min-max
      5) Return final results
     """
-    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals( truncation_range=truncation_range,\
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,\
                                                                                 n=n,N=N,choice=choice)
     
 
@@ -803,26 +804,41 @@ def run_experiment_no_M(solver=None,
 N = 14 #number of discretization points
 
 truncation_range = 2 #truncation range for the discretization points
-
-disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals( truncation_range=truncation_range,
+if __name__ == "__main__":
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,
                                                                             N=N,
                                                                             choice="non-uniform")
 
 
 #the discretization points
-K1, K2 = disc_points_new 
 
 #the list of all short_strikes
 
-short_strike_range = [round(float(disc_points_new[0][7]),4),
-                 round(float(disc_points_new[0][6]),4),
-                 round(float(disc_points_new[0][8]),4),
-                 round(float(disc_points_new[0][5]),4),
-                 round(float(disc_points_new[0][9]),4),
-                 round(float(disc_points_new[0][4]),4),
-                 round(float(disc_points_new[0][11]),4)]
+# short_strike_range = [round(float(disc_points_new[0][7]),4),
+#                  round(float(disc_points_new[0][6]),4),
+#                  round(float(disc_points_new[0][8]),4),
+#                  round(float(disc_points_new[0][5]),4),
+#                  round(float(disc_points_new[0][9]),4),
+#                  round(float(disc_points_new[0][4]),4),
+#                  round(float(disc_points_new[0][11]),4)]
+def get_strike_range_for_K(K, truncation_range=2, N=19, choice="non-uniform"):
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(
+      K,  truncation_range=truncation_range, N=N, choice=choice
+    )
+    K1 = disc_points_new[0]
+    # Build the short_strike_range as before, but using the new K
+    short_strike_range = [
+        round(float(K1[7]), 4),
+        round(float(K1[6]), 4),
+        round(float(K1[8]), 4),
+        round(float(K1[5]), 4),
+        round(float(K1[9]), 4),
+        round(float(K1[4]), 4),
+        round(float(K1[11]), 4)
+    ]
+    return disc_points_new, marg, short_strike_range
 
-# print(f"\n The available short strikes are: { short_strike_range}")          #commented by me
+    print(f"\n The available short strikes are: { short_strike_range}")          #commented by me
 
 
 # In[29]:
@@ -1143,18 +1159,35 @@ def objective_value_for_stock_paths(time_point,stock_price_values, optimal_weigh
 # **EXPERIMENT 1: Run the minimization algorithm without bounds on weights**
 
 # In[35]:
+# Step 1: Generate the available strikes for this K
+if __name__ == "__main__":
+    disc_points_new, marg, short_strike_range = get_strike_range_for_K(K, truncation_range, N, choice = "non-uniform")
+
+# Step 2: Show the user the available short strikes and their indices
+if __name__ == "__main__":
+    print("Available short strikes (by index):")
+    for idx, val in enumerate(short_strike_range):
+        print(f"{idx}: {val}")
+    # Step 3: Get user input for indices
+    selected_indices = input("Enter indices of short strikes (comma-separated, e.g. 0,2,4): ")
+    selected_indices = [int(i.strip()) for i in selected_indices.split(",")]
+
+
+    # Step 4: Build the actual strikes to use
+    short_strikes = [short_strike_range[i] for i in selected_indices]
+    no_of_options = len(selected_indices)
 
 
 # if __name__ == "__main__":
-def run_experiment_no_M_without_bounds():
+def run_experiment_no_M_without_bounds(K,no_of_options, short_strikes):
 
     """
     Runs the no-bound optimization experiment and returns a result dictionary.
     """
-    no_of_options = 4
-    short_strikes = short_strike_range[:no_of_options]
+    # no_of_options = 4
+    # short_strikes = short_strike_range[:no_of_options]
 
-    result_data_no_bounds = run_experiment_no_M(
+    result_data_no_bounds = run_experiment_no_M(K,
         solver="gurobi",
         truncation_range=truncation_range,
         N=N,
@@ -1183,10 +1216,10 @@ def run_experiment_no_M_without_bounds():
 
     return run_dict_no_bounds
 
-result_data_no_bounds = run_experiment_no_M_without_bounds()
+# result_data_no_bounds = run_experiment_no_M_without_bounds(no_of_options, short_strikes)
 print(f"========== Experiment Complete ==========")
-print("Optimal Weights:", result_data_no_bounds["Optimal_weights"])
-print("Final Value from min-max:", result_data_no_bounds["Final_value"])
+# print("Optimal Weights:", result_data_no_bounds["Optimal_weights"])
+# print("Final Value from min-max:", result_data_no_bounds["Final_value"])
         
         
 #         current_objective = result_data_no_bounds["final_value"]
@@ -1216,8 +1249,8 @@ folder='BS_Asian_plots_MAY_2025'
 
 #PLOT AND CHECK HOW IT LOOKS
 
-Weights_opt_without_bounds = result_data_no_bounds["Optimal_weights"]
-P_matrix_no_bounds = result_data_no_bounds["P_matrix"]
+# Weights_opt_without_bounds = result_data_no_bounds["Optimal_weights"]
+# P_matrix_no_bounds = result_data_no_bounds["P_matrix"]
 # if __name__ == "__main__":
 #     # Weights_opt_without_bounds = result_data_no_bounds["w_opt"]
 #     # P_matrix_no_bounds = result_data_no_bounds["p_matrix"]
@@ -1260,17 +1293,14 @@ P_matrix_no_bounds = result_data_no_bounds["P_matrix"]
 
 # In[ ]:
 
-
-
-
-def result():
+def result(no_of_options,short_strikes):
     truncation_range =2
 
     N=19
     choice ="non-uniform"
-    no_of_options =2 
+    # no_of_options =2 
 
-    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals( truncation_range=truncation_range,\
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,\
                                                                                N=N,choice=choice)
     
 
@@ -1279,7 +1309,7 @@ def result():
     K2 = disc_points_new[1]
 
 # Pick short strikes
-    short_strikes = short_strike_range[:no_of_options] 
+    # short_strikes = short_strike_range[:no_of_options] 
     
 # print(f"Short strikes: {short_strikes}")        #commented by me
 
@@ -1311,16 +1341,14 @@ def result():
 # In[ ]:
 
 
-def run_experiment_no_M_with_bounds():
+def run_experiment_no_M_with_bounds(K,no_of_options,short_strikes):
     """
     Runs the min-max experiment with bounds on weights.
     Returns a result dictionary containing weights, matrix, values, etc.
     """
-    no_of_options = 4
-    short_strikes = short_strike_range[:no_of_options]
     bounds = [(-1.2, 1.2)]
 
-    result_data_with_bounds = run_experiment_no_M(
+    result_data_with_bounds = run_experiment_no_M(K,
         solver="gurobi",
         truncation_range=truncation_range,
         N=N,
@@ -1350,10 +1378,10 @@ def run_experiment_no_M_with_bounds():
     }
 
     return run_dict_with_bounds
-result_data_with_bounds = run_experiment_no_M_with_bounds()
+# result_data_with_bounds = run_experiment_no_M_with_bounds(no_of_options,short_strikes)
 print(f"========== Experiment Complete ==========")
-print("Optimal Weights:", result_data_with_bounds["Optimal_weights"])
-print("Final Value from min-max:", result_data_with_bounds["Final_value"])
+# print("Optimal Weights:", result_data_with_bounds["Optimal_weights"])
+# print("Final Value from min-max:", result_data_with_bounds["Final_value"])
         
         
 
@@ -1362,8 +1390,8 @@ print("Final Value from min-max:", result_data_with_bounds["Final_value"])
 
 
 #PLOT AND CHECK HOW IT LOOKS
-Weights_opt_with_bounds = result_data_with_bounds["Optimal_weights"]
-P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
+# Weights_opt_with_bounds = result_data_with_bounds["Optimal_weights"]
+# P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
 # if __name__ == "__main__":            #commented by me
 #     plot_one_run(
 #     K1,
@@ -1398,21 +1426,12 @@ P_matrix_with_bounds = result_data_with_bounds["P_matrix"]
 # **EXPERIMENT 3: Run the minimization algorithm with ridge regularization term**
 
 # In[ ]:
-
-
-
-
-    
-
-    
-lmda_reg = 0.043
-def run_experiment_with_ridge():
-    no_of_options = 4
-    short_strikes = short_strike_range[:no_of_options]
+def run_experiment_with_ridge(K,no_of_options,short_strikes):
     list_of_objectives = []
     list_of_dictionaries = []
     regularization = "ridge"
-    result_data_with_ridge = run_experiment_no_M(solver="gurobi",
+    lmda_reg = 0.043
+    result_data_with_ridge = run_experiment_no_M(K,solver="gurobi",
         truncation_range=truncation_range,
         N=N,
         no_of_options=no_of_options,
@@ -1444,10 +1463,10 @@ def run_experiment_with_ridge():
         "Hedge_value": result_data_with_ridge["hedge_value"]
      }
     return run_dict_with_ridge
-result_data_with_ridge = run_experiment_with_ridge()
+# result_data_with_ridge = run_experiment_with_ridge(no_of_options,short_strikes)
 print(f"========== Experiment Complete ==========")
-print("Optimal Weights:", result_data_with_ridge["Optimal_weights"])
-print("Final Value from min-max:", result_data_with_ridge["Final_value"])
+# print("Optimal Weights:", result_data_with_ridge["Optimal_weights"])
+# print("Final Value from min-max:", result_data_with_ridge["Final_value"])
         
         
 
@@ -1456,8 +1475,8 @@ print("Final Value from min-max:", result_data_with_ridge["Final_value"])
 
 
 #PLOT AND CHECK HOW IT LOOKS
-Weights_opt_with_ridge = result_data_with_ridge["Optimal_weights"]
-P_matrix_with_ridge = result_data_with_ridge["P_matrix"]
+# Weights_opt_with_ridge = result_data_with_ridge["Optimal_weights"]
+# P_matrix_with_ridge = result_data_with_ridge["P_matrix"]
 
 # if __name__ == "__main__":
 #     plot_one_run( K1,
@@ -1494,19 +1513,13 @@ P_matrix_with_ridge = result_data_with_ridge["P_matrix"]
 # **EXPERIMENT 4: Run the minimization algorithm with lasso regularization term**
 
 # In[ ]:
-
-
-
-    
-
-    
-lmda_reg = 0.005
-def run_experiment_with_lasso():
-    no_of_options = 4
-    short_strikes = short_strike_range[:no_of_options]
+def run_experiment_with_lasso(K,no_of_options,short_strikes):
+    # no_of_options = 4
+    # short_strikes = short_strike_range[:no_of_options]
     list_of_objectives = []
-    list_of_dictionaries = []   
-    result_data_with_lasso = run_experiment_no_M(solver="gurobi",
+    list_of_dictionaries = [] 
+    lmda_reg = 0.005  
+    result_data_with_lasso = run_experiment_no_M(K,solver="gurobi",
         truncation_range=truncation_range,
         N=N,
         no_of_options=no_of_options,
@@ -1538,10 +1551,10 @@ def run_experiment_with_lasso():
         "Hedge_value": result_data_with_lasso["hedge_value"]
      }
     return run_dict_with_lasso
-result_data_with_lasso = run_experiment_with_lasso()
+# result_data_with_lasso = run_experiment_with_lasso(no_of_options,short_strikes)
 print(f"========== Experiment Complete ==========")
-print("Optimal Weights:", result_data_with_lasso["Optimal_weights"])
-print("Final Value from min-max:", result_data_with_lasso["Final_value"])
+# print("Optimal Weights:", result_data_with_lasso["Optimal_weights"])
+# print("Final Value from min-max:", result_data_with_lasso["Final_value"])
         
         
 
@@ -1550,8 +1563,8 @@ print("Final Value from min-max:", result_data_with_lasso["Final_value"])
 
 
 #PLOT AND CHECK HOW IT LOOKS
-Weights_opt_with_lasso = result_data_with_lasso["Optimal_weights"]
-P_matrix_with_lasso = result_data_with_lasso["P_matrix"]
+# Weights_opt_with_lasso = result_data_with_lasso["Optimal_weights"]
+# P_matrix_with_lasso = result_data_with_lasso["P_matrix"]
 
 # if __name__ == "__main__":
 
