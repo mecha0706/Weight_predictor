@@ -50,18 +50,22 @@ from BS_asian_all_combined_MAY_2025 import (
     run_experiment_with_ridge,
     run_experiment_with_lasso,
     truncation_range,
-    N
+    N,
+    simulate_stock_paths,
+    get_disc_points_and_marginals
 )
 
-def get_strike_choices(K):
+def get_strike_choices(stock,K):
     # Generate the available strikes for this K
-    _, _, short_strike_range = get_strike_range_for_K(K, truncation_range, N, choice="non-uniform")
+    _, _, short_strike_range = get_strike_range_for_K(stock,K, truncation_range, N, choice="non-uniform")
     # Return as a string for display
     return ", ".join([f"{i}: {v}" for i, v in enumerate(short_strike_range)])
 
-def run_all_experiments(K, no_of_options, indices_str):
+def run_all_experiments(stock, K, no_of_options, indices_str):
+    get_disc_points_and_marginals(K,stock,truncation_range=None,n=None, N=14,choice="uniform")
+    time_indices, _= simulate_stock_paths(stock)
     # Get available strikes for this K
-    _, _, short_strike_range = get_strike_range_for_K(K, truncation_range, N, choice="non-uniform")
+    _, _, short_strike_range = get_strike_range_for_K(stock,K, truncation_range, N, choice="non-uniform")
     # Parse indices
     try:
         selected_indices = [int(i.strip()) for i in indices_str.split(",") if i.strip()]
@@ -76,10 +80,10 @@ def run_all_experiments(K, no_of_options, indices_str):
     except IndexError:
         return f"Error: One or more indices are out of range. Valid indices: 0 to {len(short_strike_range)-1}", "", "", ""
     # Run experiments
-    A = run_experiment_no_M_without_bounds(K,no_of_options, short_strikes)
-    B = run_experiment_no_M_with_bounds(K,no_of_options, short_strikes)
-    C = run_experiment_with_ridge(K,no_of_options, short_strikes)
-    D = run_experiment_with_lasso(K,no_of_options, short_strikes)
+    A = run_experiment_no_M_without_bounds(stock,K,no_of_options, short_strikes)
+    B = run_experiment_no_M_with_bounds(stock,K,no_of_options, short_strikes)
+    C = run_experiment_with_ridge(stock,K,no_of_options, short_strikes)
+    D = run_experiment_with_lasso(stock,K,no_of_options, short_strikes)
     # Format output
     def format_result(res):
         weights = np.round(res["Optimal_weights"], 6).tolist()
@@ -94,7 +98,8 @@ def run_all_experiments(K, no_of_options, indices_str):
 
 with gr.Blocks() as demo:
     gr.Markdown("## Asian Option Hedging: Optimization Strategies")
-    K = gr.Number(label="Target Strike K", value=1)
+    stock = gr.Number(label="Stock Price", value=1)
+    K = gr.Number(label="Strike price", value=1)
     no_of_options = gr.Slider(1, 7, value=3, step=1, label="Number of Options")
     strike_choices = gr.Textbox(label="Available Short Strikes (index: value)", interactive=False)
     indices_str = gr.Textbox(label="Indices of Short Strikes (comma-separated, e.g. 0,2,4)")
@@ -105,7 +110,7 @@ with gr.Blocks() as demo:
     out3 = gr.Textbox(label="Ridge Results")
     out4 = gr.Textbox(label="Lasso Results")
 
-    show_btn.click(get_strike_choices, inputs=K, outputs=strike_choices)
-    run_btn.click(run_all_experiments, inputs=[K, no_of_options, indices_str], outputs=[out1, out2, out3, out4])
+    show_btn.click(get_strike_choices, inputs=(stock,K), outputs=strike_choices)
+    run_btn.click(run_all_experiments, inputs=[stock,K, no_of_options, indices_str], outputs=[out1, out2, out3, out4])
 
-demo.launch(share=True)
+demo.launch()

@@ -20,6 +20,9 @@ import scipy.stats as si
 
 #function to get European call price
 def BS_call(stock,K,t,T,sigma,r):
+    if None in (stock, K, t, T, sigma, r):
+        raise ValueError(f"BS_call received None: stock={stock}, K={K}, t={t}, T={T}, sigma={sigma}, r={r}")
+    # ... rest of your code ...
     if K > 0:
         tau = T-t
         if tau == 0:

@@ -41,7 +41,7 @@ print("License ID:", model.getParamInfo("LicenseID"))
 #common parameters for all the experiments/GLOBAL VARIABLES
  #number of options in the hedge portfolio
 
-stock = 1 #initial stock price
+
 
 r = 0 #risk-free rate of interest
 
@@ -58,9 +58,11 @@ timepoints =2 #number of timesteps
 
 T_GRID = [0,0.5,T]#times at which the marginals of the stock price are evaluated
 
+
 short_maturity = T_GRID[1] # maturity of the options in the hedge portfolio
 if __name__ == "__main__":
     K = 1 # target option's strike price
+    stock = 1 # stock price at time 0
 
 
 #short_strike_range = [1,1.1,0.9,1.2,0.8,1.25,1.05,0.85,]#range of short strikes for increasing number of options
@@ -68,7 +70,7 @@ if __name__ == "__main__":
 
 # In[4]:
 
-
+N=14
 def Asian_option_payoff(stock_price_t1,stock_price_T,strike_price):
     return np.maximum(0.5*(stock_price_t1+stock_price_T)-strike_price,0)
 
@@ -93,109 +95,108 @@ def Asian_option_payoff(stock_price_t1,stock_price_T,strike_price):
 
 
 #function to return the discretization points, call prices and the marginals for a given value of truncation range and number of discretization points and choice of uniform or nonuniform grid
-
-def get_disc_points_and_marginals(K,truncation_range=None,n=None, N=None,choice="uniform"):
+def get_disc_points_and_marginals(K,stock,truncation_range=None,n=None, N=N,choice="uniform"):
     """
-       Generate the discretization points for the given problem depending on uniform or non-uniform grid
-       Parameters: 
-          Global variables: Stock, sigma, T,r,
-          Local variables: n- (1/n) denotes the spacing between the discretization points
-                        
-    """
+    Generate the discretization points for the given problem depending on uniform or non-uniform grid
+    Parameters: 
+        Global variables: Stock, sigma, T,r,
+        Local variables: n- (1/n) denotes the spacing between the discretization points
+                    
+"""
     if choice == "uniform":
         if truncation_range == None or n == None:
             return ("Need to provide n or truncation range")
-        #return a uniform grid
+    #return a uniform grid
         D = np.linspace(0, truncation_range, int(truncation_range*n)+1)
-        
-        
-        #next we find the point where the interpolated line joining the last two strike points takes value zero
+    
+    
+    #next we find the point where the interpolated line joining the last two strike points takes value zero
         R_0 = find_zero(BS_call,stock,D,T,sigma,r)
-        
+    
 #         print(f"The interpolated line takes the value 0 at {R_0}")
-        
-        #print the corresponding call value
+    
+    #print the corresponding call value
 #         print(f"Strike:{R_0},Interpolated call value:{interpolated_line(stock,D,T,sigma,r,R_0)}")
-        
-        
-        #extending the truncation range to include the new points till the zero of the interpolated call value
+    
+    
+    #extending the truncation range to include the new points till the zero of the interpolated call value
         K1_new = append_numbers(D,D[-1],R_0,np.diff(D)[0])
-        
+    
 #         print(f"Extended truncation range for time {t1[1]}:{K1_new}")
 #         print(f"length of new truncation range :{len(K1_new)}")
 #         print(f"previous length:{len(D)}")
-        
+    
         K2_new = append_numbers(D,D[-1],R_0,np.diff(D)[0])
 #         print(f"Extended truncation range for time {t1[2]}:{K2_new}")
 #         print(f"spacing:{K2_new[-2]/(len(K2_new)-2)},{D[-1]/(len(D)-1)}") 
-        
-        
-        #getting the new discretization points
+    
+    
+    #getting the new discretization points
         disc_points_new = disc_points_new_1(K1_new,K2_new)
-        # print(f"The new discretization points are:{disc_points_new}") commented by me
-        
-        # store the call prices as a 2D array
+    # print(f"The new discretization points are:{disc_points_new}") commented by me
+    
+    # store the call prices as a 2D array
         call_prices_array_new = np.vstack((call_prices(stock,D,K1_new,T_GRID[1],sigma,r),
-                                           call_prices(stock,D,K2_new,T,sigma,r)))
+                                        call_prices(stock,D,K2_new,T,sigma,r)))
 #         print(call_prices_array_new)
-        
-        #getting the discrete marginal distributions
+    
+    #getting the discrete marginal distributions
 
         marg = marginal_new(call_prices_array_new,disc_points_new,timepoints,T_GRID)
 #         print(marginal_new(call_prices_array_new,disc_points_new,timepoints,t1))
-        
-        
-        #returns the grid and the number of grid points
+    
+    
+    #returns the grid and the number of grid points
         return disc_points_new,call_prices_array_new,marg
     else:
         if N == None:
             return print("Need to provide N")
         np.random.seed(12)
         grid = np.random.normal(K,sigma,N-2)# creating a grid concentrated around the target strike
-        
+    
         grid = np.append([0,truncation_range],grid)# adding 0 and the final truncation point to the list
-        
+    
         grid = np.sort(grid)# sorting the grid in ascending order
-        
-        
-         #next we find the point where the interpolated line joining the last two strike points takes value zero
+    
+    
+        #next we find the point where the interpolated line joining the last two strike points takes value zero
         R_0_T1 = find_zero(BS_call,stock,grid,T_GRID[1],sigma,r)
-        # print(f"The strike for time {T_GRID[1]} is {R_0_T1} and interpolated call value: {interpolated_line(stock,grid,T_GRID[1],sigma,r,R_0_T1)}")
-        #commented by me
+    # print(f"The strike for time {T_GRID[1]} is {R_0_T1} and interpolated call value: {interpolated_line(stock,grid,T_GRID[1],sigma,r,R_0_T1)}")
+    #commented by me
 
         R_0_T = find_zero(BS_call,stock,grid,T,sigma,r)
-        # print(f"The strike for time {T} is {R_0_T} and interpolated call value: {interpolated_line(stock,grid,T,sigma,r,R_0_T)}")
-                #commented by me
+    # print(f"The strike for time {T} is {R_0_T} and interpolated call value: {interpolated_line(stock,grid,T,sigma,r,R_0_T)}")
+            #commented by me
         R_0 = max(R_0_T1,R_0_T)
-        
+    
 #         #next we find the point where the interpolated line joining the last two strike points takes value zero
 #         R_0 = find_zero(BS_call,stock, grid,T,sigma,r)
-        
+    
 #         print(f"The interpolated line takes the value 0 at {R_0}")
-        
+    
 #         #print the corresponding call value
 #         print(f"Strike:{R_0},Interpolated call value:{interpolated_line(stock,grid,T,sigma,r,R_0)}")
-        
+    
         new_grid = np.append(grid,[R_0])
-        
+    
         K1_new = K2_new = new_grid
-        
-        #getting the new discretization points
+    
+    #getting the new discretization points
         disc_points_new = disc_points_new_1(K1_new,K2_new)
-        # print(f"The new discretization points are:{disc_points_new}")          #commented by me
-        # print(f"Number of discretization points are:{len(K1_new)}")        #commented by me
-        
-                
-        # store the call prices as a 2D array
+    # print(f"The new discretization points are:{disc_points_new}")          #commented by me
+    # print(f"Number of discretization points are:{len(K1_new)}")        #commented by me
+    
+            
+    # store the call prices as a 2D array
         call_prices_array_new = np.vstack((call_prices(stock,grid,K1_new,T_GRID[1],sigma,r),call_prices(stock,grid,K2_new,T,sigma,r)))
 #         print(call_prices_array_new)
-        
-        #getting the discrete marginal distributions
+    
+    #getting the discrete marginal distributions
 
         marg = marginal_new(call_prices_array_new,disc_points_new,timepoints,T_GRID)
 #         print(marginal_new(call_prices_array_new,disc_points_new,timepoints,T_GRID))
-        
-        #returns the grid and the number of grid points
+    
+    #returns the grid and the number of grid points
         return disc_points_new,call_prices_array_new,marg
 # print(BS_call(1000,990,0,1,0.05,0))
 
@@ -652,10 +653,10 @@ def check_constraints_pulp_solution_no_M(
 #  MAIN DRIVER (run_experiment) 
 ###############################################################################
     # Build grid & marginals
-def run_experiment_no_M(K,solver=None,
+def run_experiment_no_M(stock,K,solver=None,
     truncation_range=None,
     n=None,
-    N=None,
+    N=N,
     no_of_options=None,
     short_strikes=None,
     epsilon=None,
@@ -675,7 +676,7 @@ def run_experiment_no_M(K,solver=None,
      4) Solve min-max
      5) Return final results
     """
-    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,\
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K,stock, truncation_range=truncation_range,\
                                                                                 n=n,N=N,choice=choice)
     
 
@@ -805,7 +806,7 @@ N = 14 #number of discretization points
 
 truncation_range = 2 #truncation range for the discretization points
 if __name__ == "__main__":
-    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K,stock, truncation_range=truncation_range,
                                                                             N=N,
                                                                             choice="non-uniform")
 
@@ -821,9 +822,9 @@ if __name__ == "__main__":
 #                  round(float(disc_points_new[0][9]),4),
 #                  round(float(disc_points_new[0][4]),4),
 #                  round(float(disc_points_new[0][11]),4)]
-def get_strike_range_for_K(K, truncation_range=2, N=19, choice="non-uniform"):
+def get_strike_range_for_K(stock,K, truncation_range=2, N=19, choice="non-uniform"):
     disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(
-      K,  truncation_range=truncation_range, N=N, choice=choice
+      K,stock,  truncation_range=truncation_range, N=N, choice=choice
     )
     K1 = disc_points_new[0]
     # Build the short_strike_range as before, but using the new K
@@ -1028,37 +1029,52 @@ def plot_one_run(
 
 #### SIMULATE STOCK PATHS TO COMPUTE THE QUANTILES ####
 # if __name__ == "__main__" : 
-Nsim = 10000
-Nsteps = timepoints * 10
-delta_t = 1/Nsteps
+def simulate_stock_paths(stock, Nsim=10000, timepoints=2, sigma=0.2, r=0):
+    Nsteps = timepoints * 10
+    delta_t = 1 / Nsteps
+    stock_paths = np.zeros([Nsim, Nsteps + 1])
+    stock_paths[:, 0] = stock
+    np.random.seed(2)
+    Z1 = np.random.normal(size=[Nsim, Nsteps])
+    time_indices = [0]
+    for i in range(Nsteps):
+        stock_paths[:, i + 1] = stock_paths[:, i] * np.exp((r - 0.5 * sigma ** 2) * delta_t +
+                                                           sigma * np.sqrt(delta_t) * Z1[:, i])
+        time_indices.append(delta_t * (i + 1))
 
-stock_paths = np.zeros([Nsim,Nsteps+1])
-stock_paths[:,0] = stock
-np.random.seed(2)
-Z1 = np.random.normal(size=[Nsim,Nsteps])
 
-time_indices = [] # list to store the corresponding time-points at which the stock paths are beong calculated
-time_indices.append(0)
+# Nsim = 10000  # number of simulations
+# Nsteps = timepoints * 10
+# delta_t = 1/Nsteps
 
-for i in range(Nsteps):
-    stock_paths[:,i+1] = stock_paths[:,i] * np.exp((r - 0.5 * (sigma **2)) * delta_t \
-        + sigma * np.sqrt(delta_t) * Z1[:,i])
+# stock_paths = np.zeros([Nsim,Nsteps+1])
+# stock_paths[:,0] = stock
+# np.random.seed(2)
+# Z1 = np.random.normal(size=[Nsim,Nsteps])
 
-    time_indices.append(delta_t * (i + 1))
+    time_indices = [] # list to store the corresponding time-points at which the stock paths are beong calculated
+    time_indices.append(0)
 
-    
-index1 = time_indices.index(T_GRID[1]) #index corresponding to short maturity
-index2 = time_indices.index(T) #index corresponding to target maturity
+    for i in range(Nsteps):
+        stock_paths[:,i+1] = stock_paths[:,i] * np.exp((r - 0.5 * (sigma **2)) * delta_t \
+            + sigma * np.sqrt(delta_t) * Z1[:,i])
 
-# print(f"Index corresponding to short maturity {time_indices[index1]} :{index1}")         #commented by me
-    
-# print(f"Index corresponding to target maturity {time_indices[index2]} :{index2}")         #commented by me
-    
+        time_indices.append(delta_t * (i + 1))
+
+
+    index1 = time_indices.index(T_GRID[1]) #index corresponding to short maturity
+    index2 = time_indices.index(T) #index corresponding to target maturity
+
+    # print(f"Index corresponding to short maturity {time_indices[index1]} :{index1}")         #commented by me
+
+    # print(f"Index corresponding to target maturity {time_indices[index2]} :{index2}")         #commented by me
+
     #plot the stock paths
-t_paths = np.linspace(0, Nsteps, Nsteps+1)
-plt.plot(t_paths,stock_paths.transpose())
-plt.show()
-plt.close()
+    t_paths = np.linspace(0, Nsteps, Nsteps+1)
+    plt.plot(t_paths,stock_paths.transpose())
+    plt.show()
+    plt.close()
+    return stock_paths, time_indices
     
     #print the intermediate time points
 # print(f"Time indices:\n {time_indices}")          #commented by me
@@ -1161,7 +1177,7 @@ def objective_value_for_stock_paths(time_point,stock_price_values, optimal_weigh
 # In[35]:
 # Step 1: Generate the available strikes for this K
 if __name__ == "__main__":
-    disc_points_new, marg, short_strike_range = get_strike_range_for_K(K, truncation_range, N, choice = "non-uniform")
+    disc_points_new, marg, short_strike_range = get_strike_range_for_K(stock,K, truncation_range, N, choice = "non-uniform")
 
 # Step 2: Show the user the available short strikes and their indices
 if __name__ == "__main__":
@@ -1179,7 +1195,7 @@ if __name__ == "__main__":
 
 
 # if __name__ == "__main__":
-def run_experiment_no_M_without_bounds(K,no_of_options, short_strikes):
+def run_experiment_no_M_without_bounds(stock,K,no_of_options, short_strikes):
 
     """
     Runs the no-bound optimization experiment and returns a result dictionary.
@@ -1187,7 +1203,7 @@ def run_experiment_no_M_without_bounds(K,no_of_options, short_strikes):
     # no_of_options = 4
     # short_strikes = short_strike_range[:no_of_options]
 
-    result_data_no_bounds = run_experiment_no_M(K,
+    result_data_no_bounds = run_experiment_no_M(stock,K,
         solver="gurobi",
         truncation_range=truncation_range,
         N=N,
@@ -1300,7 +1316,7 @@ def result(no_of_options,short_strikes):
     choice ="non-uniform"
     # no_of_options =2 
 
-    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K, truncation_range=truncation_range,\
+    disc_points_new, call_prices_array_new, marg = get_disc_points_and_marginals(K,stock, truncation_range=truncation_range,\
                                                                                N=N,choice=choice)
     
 
@@ -1341,14 +1357,14 @@ def result(no_of_options,short_strikes):
 # In[ ]:
 
 
-def run_experiment_no_M_with_bounds(K,no_of_options,short_strikes):
+def run_experiment_no_M_with_bounds(stock,K,no_of_options,short_strikes):
     """
     Runs the min-max experiment with bounds on weights.
     Returns a result dictionary containing weights, matrix, values, etc.
     """
     bounds = [(-1.2, 1.2)]
 
-    result_data_with_bounds = run_experiment_no_M(K,
+    result_data_with_bounds = run_experiment_no_M(stock,K,
         solver="gurobi",
         truncation_range=truncation_range,
         N=N,
@@ -1426,12 +1442,12 @@ print(f"========== Experiment Complete ==========")
 # **EXPERIMENT 3: Run the minimization algorithm with ridge regularization term**
 
 # In[ ]:
-def run_experiment_with_ridge(K,no_of_options,short_strikes):
+def run_experiment_with_ridge(stock,K,no_of_options,short_strikes):
     list_of_objectives = []
     list_of_dictionaries = []
     regularization = "ridge"
     lmda_reg = 0.043
-    result_data_with_ridge = run_experiment_no_M(K,solver="gurobi",
+    result_data_with_ridge = run_experiment_no_M(stock,K,solver="gurobi",
         truncation_range=truncation_range,
         N=N,
         no_of_options=no_of_options,
@@ -1513,13 +1529,13 @@ print(f"========== Experiment Complete ==========")
 # **EXPERIMENT 4: Run the minimization algorithm with lasso regularization term**
 
 # In[ ]:
-def run_experiment_with_lasso(K,no_of_options,short_strikes):
+def run_experiment_with_lasso(stock,K,no_of_options,short_strikes):
     # no_of_options = 4
     # short_strikes = short_strike_range[:no_of_options]
     list_of_objectives = []
     list_of_dictionaries = [] 
     lmda_reg = 0.005  
-    result_data_with_lasso = run_experiment_no_M(K,solver="gurobi",
+    result_data_with_lasso = run_experiment_no_M(stock,K,solver="gurobi",
         truncation_range=truncation_range,
         N=N,
         no_of_options=no_of_options,
