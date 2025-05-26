@@ -1212,7 +1212,7 @@ def run_experiment_no_M_without_bounds(stock,K,no_of_options, short_strikes):
         epsilon=0,
         M_bound=0,
         choice="non-uniform",
-        x0=[0, 1, 0, 0, 0]
+        x0=[0] * (no_of_options + 1),
     )
 
     run_dict_no_bounds = {
