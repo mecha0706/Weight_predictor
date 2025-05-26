@@ -46,9 +46,10 @@ print("License ID:", model.getParamInfo("LicenseID"))
 r = 0 #risk-free rate of interest
 
 sigma = 0.2 #volatility of the stock price
-
-T = 1 #target maturity
-
+if __name__ == "__main__":
+    T = 1 #target maturity
+    T_GRID = [0,0.5,T]#times at which the marginals of the stock price are evaluated
+    short_maturity = T_GRID[1] # maturity of the options in the hedge portfolio
 mu = 0 #return of the stock price
 
 t = 0
@@ -56,10 +57,10 @@ t = 0
 timepoints =2 #number of timesteps
 
 
-T_GRID = [0,0.5,T]#times at which the marginals of the stock price are evaluated
 
 
-short_maturity = T_GRID[1] # maturity of the options in the hedge portfolio
+
+
 if __name__ == "__main__":
     K = 1 # target option's strike price
     stock = 1 # stock price at time 0
