@@ -216,7 +216,25 @@ def find_zero(BS_call,stock,K2,T,sigma,r):
     den = BS_call(stock,K2[-2],0,T,sigma,r) -BS_call(stock,K2[-1],0,T,sigma,r) 
     return num/den
 
+def find_zero_from_data(call_price_list,strike_list):
+    """
+    Find the first value of x in the range [a, b] such that f(x) is close to zero.
 
+    Parameters:
+    f (function): The function to evaluate.
+    a (float): Start of the range.
+    b (float): End of the range.
+    epsilon (float): Threshold for f(x) to be considered close to zero.
+    step (float): Step size for incrementing x.
+
+    Returns:
+    float: The first value of x such that |f(x)| < epsilon, or None if not found.
+    """
+    call_price_list = [float(str(x).replace(',', '')) for x in call_price_list]
+    strike_list = [float(str(x).replace(',', '')) for x in strike_list]
+    num = strike_list[-1] * call_price_list[-2] - strike_list[-2] * call_price_list[-1]
+    den = call_price_list[-2] - call_price_list[-1]
+    return num / den
 
 # In[ ]:
 
@@ -269,6 +287,30 @@ def call_interpolated_MJD(stock,K2,T,sigma,r,lmda,g,mu_j,sigma_j,div,point):
 
 #storing all the call prices
 
+def call_prices_from_data(call_list_old,disc_points_old,disc_points_new):
+    #length of old truncation range
+    length_old = len(disc_points_old)
+
+    #length of new truncation range
+    length_new = len(disc_points_new)
+
+
+    call_price = np.zeros(length_new)
+
+    if length_old == length_new:
+        #defining call prices using Black-Scholes
+        call_price = call_list_old
+    if length_old < length_new:
+        #defining call prices in the earlier range using Black-Scholes
+        call_price_old = call_list_old
+
+        
+        call_price = np.append(call_price_old,0)
+
+    #last call price has to be zero
+    call_price[-1] = 0
+    return call_price
+
 def call_prices(stock,disc_points_old,disc_points_new,T,sigma,r):
     #length of old truncation range
     length_old = len(disc_points_old)
@@ -294,8 +336,6 @@ def call_prices(stock,disc_points_old,disc_points_new,T,sigma,r):
     #last call price has to be zero
     call_price[-1] = 0
     return call_price
-
-
 # In[ ]:
 
 
